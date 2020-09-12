@@ -9,7 +9,7 @@ public class ProjectLayoutPresenter implements ProjectLayout.Listener {
     private final TreeDataProvider<ProjectActivity> inMemoryDataProvider;
     private final TreeData<ProjectActivity> treeData;
 
-    public ProjectLayoutPresenter(ProjectLayout layout){
+    public ProjectLayoutPresenter(ProjectLayout layout) {
         this.layout = layout;
         this.layout.setListener(this);
 
@@ -22,6 +22,12 @@ public class ProjectLayoutPresenter implements ProjectLayout.Listener {
     @Override
     public void addActivity(ProjectActivity projectActivity, String title) {
         treeData.addItem(projectActivity, new ProjectActivity(projectActivity, title));
+        inMemoryDataProvider.refreshAll();
+    }
+
+    @Override
+    public void removeActivity(ProjectActivity projectActivity) {
+        treeData.removeItem(projectActivity);
         inMemoryDataProvider.refreshAll();
     }
 }
