@@ -23,10 +23,7 @@ public class MyUI extends UI {
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         final ProjectLayout layout = new ProjectLayout();
-        final ProjectLayoutPresenter presenter = new ProjectLayoutPresenter(layout);
-        
-
-        
+        new ProjectLayoutPresenter(layout);
         setContent(layout);
     }
 

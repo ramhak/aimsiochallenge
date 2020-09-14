@@ -1,13 +1,10 @@
 package com.aimsio.view;
 
 import com.aimsio.model.ProjectActivity;
-import com.vaadin.server.FileDownloader;
-import com.vaadin.server.StreamResource;
 import com.vaadin.ui.*;
 
 import java.io.ByteArrayInputStream;
-import java.util.Set;
-import java.util.UUID;
+import java.io.InputStream;
 
 public class ProjectLayout extends VerticalLayout {
 
@@ -26,33 +23,28 @@ public class ProjectLayout extends VerticalLayout {
         tree.setWidth("300px");
         tree.setHeight("300px");
         tree.addStyleName("with-border");
+
         Button addButton = new Button("Add");
         addButton.addClickListener(e -> {
-            if (listener != null) {
-                Set<ProjectActivity> selectedItems = tree.getSelectedItems();
-                listener.addActivity(selectedItems.size() == 0 ? null : selectedItems.iterator().next(), name.getValue());
+                listener.addActivity(tree.asSingleSelect().getOptionalValue().orElse(null), name.getValue());
                 name.setValue("");
-            }
         });
-
 
         Button deleteButton = new Button("Delete");
-        deleteButton.addClickListener(e -> {
-            if (listener != null) {
-                Set<ProjectActivity> selectedItems = tree.getSelectedItems();
-                listener.removeActivity(selectedItems.size() == 0 ? null : selectedItems.iterator().next());
-            }
-        });
-
+        deleteButton.addClickListener(e -> listener
+                .removeActivity(tree.asSingleSelect().getOptionalValue().orElse(null)));
 
         Button exportButton = new Button("Export");
-        FileDownloader exportFileDownloader = new FileDownloader(
-                new StreamResource((StreamResource.StreamSource) () -> null, "")
-        );
-        exportButton.addClickListener(e -> {
-            StreamResource aaa = new StreamResource((StreamResource.StreamSource) () -> new ByteArrayInputStream(UUID.randomUUID().toString().getBytes()), "test.txt");
-            exportFileDownloader.setFileDownloadResource(aaa);
+        OnDemandFileDownloader exportFileDownloader = new OnDemandFileDownloader(new OnDemandFileDownloader.OnDemandStreamResource() {
+            @Override
+            public String getFilename() {
+                return "test.txt";
+            }
 
+            @Override
+            public InputStream getStream() {
+                return new ByteArrayInputStream(listener.exportData().getBytes());
+            }
         });
         exportFileDownloader.extend(exportButton);
 
@@ -81,5 +73,8 @@ public class ProjectLayout extends VerticalLayout {
         void addActivity(ProjectActivity projectActivity, String title);
 
         void removeActivity(ProjectActivity projectActivity);
+
+        String exportData();
+
     }
 }
