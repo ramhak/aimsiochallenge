@@ -2,6 +2,8 @@ package com.aimsio;
 
 import javax.servlet.annotation.WebServlet;
 
+import com.aimsio.view.CommandExecutor;
+import com.aimsio.view.PersistenceUnitInitiator;
 import com.aimsio.view.ProjectLayout;
 import com.aimsio.view.ProjectLayoutPresenter;
 import com.vaadin.annotations.Theme;
@@ -23,7 +25,8 @@ public class MyUI extends UI {
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         final ProjectLayout layout = new ProjectLayout();
-        new ProjectLayoutPresenter(layout);
+        CommandExecutor commandExecutor = new CommandExecutor(new PersistenceUnitInitiator().getEntityManagerFactory());
+        new ProjectLayoutPresenter(layout, commandExecutor);
         setContent(layout);
     }
 

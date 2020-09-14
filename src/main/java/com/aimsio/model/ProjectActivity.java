@@ -1,21 +1,34 @@
 package com.aimsio.model;
 
+import javax.persistence.*;
+@Entity
 public class ProjectActivity {
-    ProjectActivity parentNode;
+    public ProjectActivity() {
+    }
+
     String title;
+    @Transient
     float hours;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn
+    private ProjectActivity parent;
+
     public ProjectActivity(ProjectActivity parentNode, String title) {
-        this.parentNode = parentNode;
+        this.parent = parentNode;
         this.title = title;
     }
 
     public ProjectActivity getParentNode() {
-        return parentNode;
+        return parent;
     }
 
     public void setParentNode(ProjectActivity parentNode) {
-        this.parentNode = parentNode;
+        this.parent = parentNode;
     }
 
     public String getTitle() {

@@ -6,15 +6,16 @@ import com.vaadin.data.provider.TreeDataProvider;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ProjectLayoutPresenter implements ProjectLayout.Listener {
     private final ProjectLayout layout;
     private final TreeDataProvider<ProjectActivity> inMemoryDataProvider;
+    private final ICommandExecutor commandExecutor;
 
 
-    public ProjectLayoutPresenter(ProjectLayout layout) {
+    public ProjectLayoutPresenter(ProjectLayout layout, ICommandExecutor commandExecutor) {
         this.layout = layout;
+        this.commandExecutor = commandExecutor;
         this.layout.setListener(this);
         inMemoryDataProvider = new TreeDataProvider<>(new TreeData<>());
         this.layout.getTree().setDataProvider(inMemoryDataProvider);
@@ -22,15 +23,23 @@ public class ProjectLayoutPresenter implements ProjectLayout.Listener {
 
 
     @Override
-    public void addActivity(ProjectActivity projectActivity, String title) {
-        inMemoryDataProvider.getTreeData().addItem(projectActivity, new ProjectActivity(projectActivity, title));
-        inMemoryDataProvider.refreshAll();
+    public void addActivity(ProjectActivity parentProjectActivity, String title) {
+        commandExecutor.execute((em)->{
+            ProjectActivity projectActivity = new ProjectActivity(parentProjectActivity, title);
+            em.persist(projectActivity);
+            inMemoryDataProvider.getTreeData().addItem(parentProjectActivity, projectActivity);
+            inMemoryDataProvider.refreshAll();
+        });
     }
 
     @Override
     public void removeActivity(ProjectActivity projectActivity) {
-        inMemoryDataProvider.getTreeData().removeItem(projectActivity);
-        inMemoryDataProvider.refreshAll();
+        commandExecutor.execute(em->{
+            em.remove(projectActivity);
+            inMemoryDataProvider.getTreeData().removeItem(projectActivity);
+            inMemoryDataProvider.refreshAll();
+        });
+
     }
 
     @Override
@@ -39,11 +48,11 @@ public class ProjectLayoutPresenter implements ProjectLayout.Listener {
         if (treeData.getRootItems().isEmpty()) {
             return "";
         }
-        ArrayList<String> acc = new ArrayList<>();
+        ArrayList<String> accumulator = new ArrayList<>();
         for (ProjectActivity item : treeData.getRootItems()) {
-            traverseAndIndent(item, "", acc, treeData);
+            traverseAndIndent(item, "", accumulator, treeData);
         }
-        return String.join("\n", acc);
+        return String.join("\n", accumulator);
     }
 
     private void traverseAndIndent(ProjectActivity item, String indent, List<String> acc, TreeData<ProjectActivity> treeData) {
