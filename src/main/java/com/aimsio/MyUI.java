@@ -9,6 +9,7 @@ import com.aimsio.backend.ProjectActivityService;
 import com.aimsio.view.*;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.data.TreeData;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
@@ -31,10 +32,7 @@ public class MyUI extends UI {
                 new JpaExecutor(entityManagerFactory)
         );
         new ProjectLayoutPresenter(
-                layout,
-                new ProjectActivityHierarchicalDataProvider(
-                        projectActivityService
-                ), projectActivityService);
+                layout, projectActivityService, new EfficientDataProvider(new TreeData<>(),projectActivityService));
         setContent(layout);
     }
 

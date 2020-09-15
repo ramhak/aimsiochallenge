@@ -9,38 +9,35 @@ import java.util.List;
 
 public class ProjectLayoutPresenter implements ProjectLayout.Listener {
     private final ProjectLayout layout;
-    private final ProjectActivityHierarchicalDataProvider dataProvider;
     private final IProjectActivityService projectActivityService;
+    private final EfficientDataProvider efficientDataProvider;
 
-
-    public ProjectLayoutPresenter(ProjectLayout layout, ProjectActivityHierarchicalDataProvider dataProvider, IProjectActivityService projectActivityService) {
+    public ProjectLayoutPresenter(ProjectLayout layout, IProjectActivityService projectActivityService, EfficientDataProvider efficientDataProvider) {
         this.layout = layout;
         this.projectActivityService = projectActivityService;
+        this.efficientDataProvider = efficientDataProvider;
         this.layout.setListener(this);
-        this.dataProvider=dataProvider;
-        this.layout.getTree().setDataProvider(this.dataProvider);
+        this.layout.getTree().setDataProvider(this.efficientDataProvider);
     }
-
 
     @Override
     public void addActivity(ProjectActivity parentProjectActivity, String title) {
             ProjectActivity projectActivity = new ProjectActivity(parentProjectActivity, title);
             projectActivityService.addProjectActivity(projectActivity);
-//            dataProvider.getTreeData().addItem(parentProjectActivity, projectActivity);
-            dataProvider.refreshItem(parentProjectActivity);
+            efficientDataProvider.getTreeData().addItem(parentProjectActivity, projectActivity);
+            efficientDataProvider.refreshAll();
     }
 
     @Override
     public void removeActivity(ProjectActivity projectActivity) {
             projectActivityService.removeProjectActivity(projectActivity);
-//            dataProvider.getTreeData().removeItem(projectActivity);
-            dataProvider.refreshAll();
+            efficientDataProvider.getTreeData().removeItem(projectActivity);
+            efficientDataProvider.refreshAll();
     }
 
     @Override
     public String exportProjectActivityData() {
-     //   TreeData<ProjectActivity> treeData = dataProvider.getTreeData();
-        TreeData<ProjectActivity> treeData = null;
+        TreeData<ProjectActivity> treeData = efficientDataProvider.getTreeData();
         if (treeData.getRootItems().isEmpty()) {
             return "";
         }
