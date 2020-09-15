@@ -51,5 +51,9 @@ public class ProjectActivity {
     public String toString() {
         return title;
     }
+
+    public Integer getId() {
+        return id;
+    }
 }
 

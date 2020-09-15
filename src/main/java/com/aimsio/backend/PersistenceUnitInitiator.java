@@ -1,4 +1,4 @@
-package com.aimsio.view;
+package com.aimsio.backend;
 
 import com.aimsio.model.ProjectActivity;
 import org.hibernate.dialect.H2Dialect;

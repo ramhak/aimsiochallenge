@@ -38,12 +38,12 @@ public class ProjectLayout extends VerticalLayout {
         OnDemandFileDownloader exportFileDownloader = new OnDemandFileDownloader(new OnDemandFileDownloader.OnDemandStreamResource() {
             @Override
             public String getFilename() {
-                return "test.txt";
+                return "report.txt";
             }
 
             @Override
             public InputStream getStream() {
-                return new ByteArrayInputStream(listener.exportData().getBytes());
+                return new ByteArrayInputStream(listener.exportProjectActivityData().getBytes());
             }
         });
         exportFileDownloader.extend(exportButton);
@@ -74,7 +74,7 @@ public class ProjectLayout extends VerticalLayout {
 
         void removeActivity(ProjectActivity projectActivity);
 
-        String exportData();
+        String exportProjectActivityData();
 
     }
 }

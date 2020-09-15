@@ -1,11 +1,12 @@
 package com.aimsio;
 
+import javax.persistence.EntityManagerFactory;
 import javax.servlet.annotation.WebServlet;
 
-import com.aimsio.view.CommandExecutor;
-import com.aimsio.view.PersistenceUnitInitiator;
-import com.aimsio.view.ProjectLayout;
-import com.aimsio.view.ProjectLayoutPresenter;
+import com.aimsio.backend.JpaExecutor;
+import com.aimsio.backend.PersistenceUnitInitiator;
+import com.aimsio.backend.ProjectActivityService;
+import com.aimsio.view.*;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
@@ -25,8 +26,15 @@ public class MyUI extends UI {
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         final ProjectLayout layout = new ProjectLayout();
-        CommandExecutor commandExecutor = new CommandExecutor(new PersistenceUnitInitiator().getEntityManagerFactory());
-        new ProjectLayoutPresenter(layout, commandExecutor);
+        EntityManagerFactory entityManagerFactory = new PersistenceUnitInitiator().getEntityManagerFactory();
+        ProjectActivityService projectActivityService = new ProjectActivityService(
+                new JpaExecutor(entityManagerFactory)
+        );
+        new ProjectLayoutPresenter(
+                layout,
+                new ProjectActivityHierarchicalDataProvider(
+                        projectActivityService
+                ), projectActivityService);
         setContent(layout);
     }
 
